@@ -22,6 +22,8 @@ func (app *App) Routes() http.Handler {
 	// Application Routes [User]
 	mux.Get("/user/signup", NoSurf(app.SignupUser))
 	mux.Post("/user/signup", NoSurf(app.CreateUser))
+	mux.Post("/users", NoSurf(app.CreateUserJson))
+	mux.Post("/users/login", NoSurf(app.LoginUserJson))
 	mux.Get("/user/login", NoSurf(app.LoginUser))
 	mux.Post("/user/login", NoSurf(app.VerifyUser))
 	mux.Post("/user/logout", app.RequireLogin(NoSurf(app.LogoutUser)))

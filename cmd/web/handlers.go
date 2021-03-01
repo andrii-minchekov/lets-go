@@ -184,6 +184,53 @@ func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (app *App) CreateUserJson(w http.ResponseWriter, r *http.Request) {
+
+	var u Users
+
+	err := json.NewDecoder(r.Body).Decode(&u)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = app.Database.InsertUser(u.Name, u.Email, u.Password)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(u)
+
+}
+
+func (app *App) LoginUserJson(w http.ResponseWriter, r *http.Request) {
+
+	//probably could use different struct with less info
+	var u Users
+
+	err := json.NewDecoder(r.Body).Decode(&u)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = app.Database.VerifyUser(u.Email, u.Password)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+}
+
 // LoginUser ...
 func (app *App) LoginUser(w http.ResponseWriter, r *http.Request) {
 
