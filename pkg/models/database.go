@@ -12,6 +12,15 @@ var (
 	ErrInvalidCredentials = errors.New("models: invalid user credentials")
 )
 
+type Db interface {
+	FindSnippets() (Snippets, error)
+	InsertSnippet(title, content string) (int, error)
+	LatestSnippets() (Snippets, error)
+	GetSnippet(id int) (*Snippet, error)
+	InsertUser(name, email, password string) error
+	VerifyUser(email, password string) (int, error)
+}
+
 // Database ...
 type Database struct {
 	*sql.DB

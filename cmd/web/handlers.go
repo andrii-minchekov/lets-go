@@ -186,7 +186,7 @@ func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (app *App) CreateUserJson(w http.ResponseWriter, r *http.Request) {
 
-	var u Users
+	var u User
 
 	err := json.NewDecoder(r.Body).Decode(&u)
 
@@ -211,7 +211,7 @@ func (app *App) CreateUserJson(w http.ResponseWriter, r *http.Request) {
 func (app *App) LoginUserJson(w http.ResponseWriter, r *http.Request) {
 
 	//probably could use different struct with less info
-	var u Users
+	var u User
 
 	err := json.NewDecoder(r.Body).Decode(&u)
 
