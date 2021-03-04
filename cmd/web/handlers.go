@@ -2,12 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/andrii-minchekov/lets-go/pkg/forms"
 	"github.com/andrii-minchekov/lets-go/pkg/models"
+	"net/http"
+	"strconv"
 )
 
 // Home Display a "Hello from Snippetbox" message
@@ -96,27 +94,18 @@ func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
 // CreateSnippet ...
 func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 
-	r.Body = http.MaxBytesReader(w, r.Body, 4096)
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
+	dec := json.NewDecoder(r.Body)
 
-	err := r.ParseForm()
+	var snippet forms.NewSnippet
+	err := dec.Decode(&snippet)
 
 	if err != nil {
 		app.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
-	form := &forms.NewSnippet{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: r.PostForm.Get("expires"),
-	}
-
-	if !form.Valid() {
-		app.RenderHTML(w, r, "new.page.html", &HTMLData{Form: form})
-		return
-	}
-
-	id, err := app.Database.InsertSnippet(form.Title, form.Content)
+	_, err = app.Database.InsertSnippet(snippet.Title, snippet.Content)
 
 	if err != nil {
 		app.ServerError(w, err)
@@ -132,8 +121,9 @@ func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
-
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(snippet)
 }
 
 // SignupUser ...
