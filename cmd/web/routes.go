@@ -25,6 +25,8 @@ func (app *App) Routes() http.Handler {
 	mux.Post("/user/login", NoSurf(app.SignInUser))
 	mux.Post("/user/logout", app.RequireLogin(NoSurf(app.LogoutUser)))
 
+	mux.Post("/users", http.HandlerFunc(app.SignUpUserJson))
+
 	fileServer := http.FileServer(http.Dir(app.Config.StaticDir()))
 
 	mux.Get("/static/", http.StripPrefix("/static", fileServer))

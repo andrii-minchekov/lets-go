@@ -2,9 +2,9 @@ package impl
 
 import (
 	"errors"
-	"fmt"
 	"github.com/andrii-minchekov/lets-go/domain/user"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type dbUserRepository struct {
@@ -14,10 +14,8 @@ type dbUserRepository struct {
 func (r dbUserRepository) CreateUser(user usr.User) (int, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 
-	fmt.Println("password is ", string(hashedPassword), "original is ", user.Password)
-
 	if err != nil {
-
+		log.Print(err)
 		return 0, err
 	}
 
@@ -25,17 +23,19 @@ func (r dbUserRepository) CreateUser(user usr.User) (int, error) {
 
 	result, err := r.db.Query(stmt, user.Name, user.Email, string(hashedPassword))
 	if err != nil {
+		log.Print(err)
 		return 0, err
 	}
 
 	if err := result.Next(); !err {
-		return 0, errors.New("no id was generated")
+		return 0, errors.New("no rows in result")
 	}
 	var id int
 	err = result.Scan(&id)
 	if err != nil {
 		return 0, err
 	}
+	log.Printf("User was created successfully with id %d", id)
 	return id, nil
 }
 
