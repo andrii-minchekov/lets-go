@@ -1,4 +1,4 @@
-package web
+package main
 
 import (
 	"bytes"
@@ -39,9 +39,7 @@ func snippet() snp.Snippet {
 
 func mockCreateSnippet(snippet snp.Snippet) *mocks.UseCases {
 	cases := mocks.UseCases{}
-	expected := snippet
-	expected.ID = 1
-	cases.On("CreateSnippet", snippet).Return(1, nil)
+	cases.On("CreateSnippet", snippet).Return(int64(1), nil)
 	return &cases
 }
 

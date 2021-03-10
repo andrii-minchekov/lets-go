@@ -1,6 +1,6 @@
 package usr
 
-type Repository interface {
+type UserRepository interface {
 	CreateUser(user User) (int, error)
 	GetUserByEmail(email string) (*User, error)
 }

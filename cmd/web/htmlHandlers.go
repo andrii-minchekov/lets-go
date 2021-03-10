@@ -1,4 +1,4 @@
-package web
+package main
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func (app *App) Home(w http.ResponseWriter, r *http.Request) {
 // ShowSnippet ...
 func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
+	id, err := strconv.ParseInt(r.URL.Query().Get(":id"), 10, 64)
 
 	if err != nil || id < 1 {
 		app.NotFound(w)

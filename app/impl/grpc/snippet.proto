@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package generated;
+
+service SnippetService {
+    rpc CreateSnippet (CreateSnippetRequest) returns (CreateSnippetResponse) {
+    }
+}
+
+message CreateSnippetRequest {
+    string title = 1;
+    string content = 2;
+}
+
+message CreateSnippetResponse {
+    int64 id = 1;
+}

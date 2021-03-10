@@ -15,14 +15,14 @@ type UseCases struct {
 }
 
 // CreateSnippet provides a mock function with given fields: snippet
-func (_m *UseCases) CreateSnippet(snippet snp.Snippet) (int, error) {
+func (_m *UseCases) CreateSnippet(snippet snp.Snippet) (int64, error) {
 	ret := _m.Called(snippet)
 
-	var r0 int
-	if rf, ok := ret.Get(0).(func(snp.Snippet) int); ok {
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(snp.Snippet) int64); ok {
 		r0 = rf(snippet)
 	} else {
-		r0 = ret.Get(0).(int)
+		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
@@ -36,11 +36,11 @@ func (_m *UseCases) CreateSnippet(snippet snp.Snippet) (int, error) {
 }
 
 // GetSnippet provides a mock function with given fields: id
-func (_m *UseCases) GetSnippet(id int) (*snp.Snippet, error) {
+func (_m *UseCases) GetSnippet(id int64) (*snp.Snippet, error) {
 	ret := _m.Called(id)
 
 	var r0 *snp.Snippet
-	if rf, ok := ret.Get(0).(func(int) *snp.Snippet); ok {
+	if rf, ok := ret.Get(0).(func(int64) *snp.Snippet); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
@@ -49,7 +49,7 @@ func (_m *UseCases) GetSnippet(id int) (*snp.Snippet, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int) error); ok {
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)

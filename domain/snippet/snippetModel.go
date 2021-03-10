@@ -5,7 +5,7 @@ import (
 )
 
 type Snippet struct {
-	ID      int
+	ID      int64
 	Title   string
 	Content string
 	Created time.Time

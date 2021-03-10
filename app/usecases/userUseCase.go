@@ -16,16 +16,16 @@ type UserUseCase interface {
 }
 
 type UserUseCaseImplTest struct {
-	Repo usr.Repository
+	Repo usr.UserRepository
 	fun  func()
 }
 
 type userUseCaseImpl struct {
-	Repo           usr.Repository
+	Repo           usr.UserRepository
 	hashComparator hashComparator
 }
 
-func NewUserUseCase(repo usr.Repository) UserUseCase {
+func NewUserUseCase(repo usr.UserRepository) UserUseCase {
 	if repo == nil {
 		log.Panicf(errRepoIsNil.Error())
 	}

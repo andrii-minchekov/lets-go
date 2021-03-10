@@ -6,23 +6,23 @@ import (
 )
 
 type SnippetUseCase interface {
-	CreateSnippet(snippet snp.Snippet) (int, error)
+	CreateSnippet(snippet snp.Snippet) (int64, error)
 	LatestSnippets() (snp.Snippets, error)
-	GetSnippet(id int) (*snp.Snippet, error)
+	GetSnippet(id int64) (*snp.Snippet, error)
 }
 
 type snippetUseCaseImpl struct {
-	Repo snp.Repository
+	Repo snp.SnippetRepository
 }
 
-func NewSnippetUseCase(repo snp.Repository) SnippetUseCase {
+func NewSnippetUseCase(repo snp.SnippetRepository) SnippetUseCase {
 	if repo == nil {
 		log.Panicf("repo shouldn't be null")
 	}
 	return snippetUseCaseImpl{Repo: repo}
 }
 
-func (useCase snippetUseCaseImpl) CreateSnippet(snippet snp.Snippet) (int, error) {
+func (useCase snippetUseCaseImpl) CreateSnippet(snippet snp.Snippet) (int64, error) {
 	id, err := useCase.Repo.AddSnippet(snippet)
 	if err != nil {
 		log.Printf("Couldn't add snippet %s", err)
@@ -40,7 +40,7 @@ func (useCase snippetUseCaseImpl) LatestSnippets() (snp.Snippets, error) {
 	return snippets, err
 }
 
-func (useCase snippetUseCaseImpl) GetSnippet(id int) (*snp.Snippet, error) {
+func (useCase snippetUseCaseImpl) GetSnippet(id int64) (*snp.Snippet, error) {
 	snippet, err := useCase.Repo.GetSnippet(id)
 	if err != nil {
 		log.Printf("Couldn't get snippet by id %d because %s", id, err)

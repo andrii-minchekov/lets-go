@@ -10,18 +10,18 @@ import (
 
 type mockRepo struct {
 	expectedErr  error
-	expSnippetId int
+	expSnippetId int64
 }
 
 func (r mockRepo) LatestSnippets() (snp.Snippets, error) {
 	panic("implement me")
 }
 
-func (r mockRepo) GetSnippet(id int) (*snp.Snippet, error) {
+func (r mockRepo) GetSnippet(id int64) (*snp.Snippet, error) {
 	panic("implement me")
 }
 
-func (r mockRepo) AddSnippet(snippet snp.Snippet) (int, error) {
+func (r mockRepo) AddSnippet(snippet snp.Snippet) (int64, error) {
 	log.Printf("Stub AddSnippet is called")
 	if r.expectedErr != nil {
 		return 0, r.expectedErr
@@ -31,7 +31,7 @@ func (r mockRepo) AddSnippet(snippet snp.Snippet) (int, error) {
 
 func TestSnippetUseCase_CreateSnippet(t *testing.T) {
 	type fields struct {
-		Repo snp.Repository
+		Repo snp.SnippetRepository
 	}
 	type args struct {
 		snippet snp.Snippet
@@ -40,7 +40,7 @@ func TestSnippetUseCase_CreateSnippet(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    int
+		want    int64
 		wantErr bool
 	}{
 		{
@@ -75,10 +75,10 @@ func TestSnippetUseCase_CreateSnippet(t *testing.T) {
 
 func TestSnippetUseCase_GetSnippet(t *testing.T) {
 	type fields struct {
-		Repo snp.Repository
+		Repo snp.SnippetRepository
 	}
 	type args struct {
-		id int
+		id int64
 	}
 	tests := []struct {
 		name    string
@@ -106,7 +106,7 @@ func TestSnippetUseCase_GetSnippet(t *testing.T) {
 
 func TestSnippetUseCase_LatestSnippets(t *testing.T) {
 	type fields struct {
-		Repo snp.Repository
+		Repo snp.SnippetRepository
 	}
 	tests := []struct {
 		name    string

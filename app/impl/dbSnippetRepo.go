@@ -10,7 +10,7 @@ type dbSnippetRepository struct {
 	db Database
 }
 
-func (r dbSnippetRepository) AddSnippet(snippet snp.Snippet) (int, error) {
+func (r dbSnippetRepository) AddSnippet(snippet snp.Snippet) (int64, error) {
 	stmt := `INSERT INTO snippets (title, content, created, expires) 
 	VALUES($1, $2, CURRENT_DATE, CURRENT_DATE + INTERVAL '100000 seconds') returning id`
 
@@ -23,7 +23,7 @@ func (r dbSnippetRepository) AddSnippet(snippet snp.Snippet) (int, error) {
 	if err := result.Next(); !err {
 		return 0, errors.New("no id was generated")
 	}
-	var id int
+	var id int64
 	err = result.Scan(&id)
 	if err != nil {
 		return 0, err
@@ -68,7 +68,7 @@ func (r dbSnippetRepository) LatestSnippets() (snp.Snippets, error) {
 	return snippets, nil
 }
 
-func (r dbSnippetRepository) GetSnippet(id int) (*snp.Snippet, error) {
+func (r dbSnippetRepository) GetSnippet(id int64) (*snp.Snippet, error) {
 
 	stmt := `SELECT id, title, content, created, expires FROM snippets WHERE id = $1`
 

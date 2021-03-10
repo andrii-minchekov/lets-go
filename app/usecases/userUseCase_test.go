@@ -14,7 +14,7 @@ import (
 
 func TestNewUserUseCase(t *testing.T) {
 	type args struct {
-		repo usr.Repository
+		repo usr.UserRepository
 	}
 	repo := &mockDbRepo{}
 	tests := []struct {
@@ -51,7 +51,7 @@ func funcName(fun interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(fun).Pointer()).Name()
 }
 
-func recoverPanicIfNeeded(fn func(repo usr.Repository) UserUseCase, arg usr.Repository) (value interface{}, err error) {
+func recoverPanicIfNeeded(fn func(repo usr.UserRepository) UserUseCase, arg usr.UserRepository) (value interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = errRepoIsNil
@@ -64,14 +64,14 @@ func recoverPanicIfNeeded(fn func(repo usr.Repository) UserUseCase, arg usr.Repo
 
 func TestUserUseCase_SignInUser(t *testing.T) {
 	type fields struct {
-		repo usr.Repository
+		repo usr.UserRepository
 	}
 	type args struct {
 		email    string
 		password string
 	}
 	expectedUserId := 1
-	mockedRepo := func(user *usr.User, err error) usr.Repository {
+	mockedRepo := func(user *usr.User, err error) usr.UserRepository {
 		mockDbRepo := &mockDbRepo{}
 		mockDbRepo.On("GetUserByEmail", mock.Anything).Return(user, err)
 		return mockDbRepo
