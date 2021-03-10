@@ -5,17 +5,47 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/andrii-minchekov/lets-go/app/impl"
-	"github.com/andrii-minchekov/lets-go/domain/user"
+	"github.com/andrii-minchekov/lets-go/app/usecases/mocks"
+	snp "github.com/andrii-minchekov/lets-go/domain/snippet"
+	usr "github.com/andrii-minchekov/lets-go/domain/user"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 )
 
-func Test_SignUpSuccess(t *testing.T) {
+func Test_CreateSnippetSuccessUT(t *testing.T) {
+	inputSnippet := snippet()
+	snippetJson, _ := json.Marshal(inputSnippet)
+	r := httptest.NewRequest("Post", "http://example.com", bytes.NewReader(snippetJson))
+	w := httptest.NewRecorder()
+	var app = &App{Cases: mockCreateSnippet(inputSnippet)}
+
+	app.CreateSnippetJson(w, r)
+
+	require.Equal(t, `{"id": 1}`, string(w.Body.Bytes()))
+	require.Equal(t, 201, w.Result().StatusCode)
+}
+
+func snippet() snp.Snippet {
+	rand.Seed(time.Now().UnixNano())
+	inputSnippet := snp.Snippet{Title: strconv.Itoa(rand.Int()), Content: fmt.Sprintf("Content %d", rand.Int())}
+	return inputSnippet
+}
+
+func mockCreateSnippet(snippet snp.Snippet) *mocks.UseCases {
+	cases := mocks.UseCases{}
+	expected := snippet
+	expected.ID = 1
+	cases.On("CreateSnippet", snippet).Return(1, nil)
+	return &cases
+}
+
+func Test_SignUpSuccessIT(t *testing.T) {
 	config := impl.NewFlagConfig()
 	srv := httptest.NewServer((&App{Config: config, Cases: impl.NewComposedUseCases(config)}).Routes())
 	defer srv.Close()
