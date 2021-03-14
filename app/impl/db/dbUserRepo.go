@@ -1,4 +1,4 @@
-package impl
+package db
 
 import (
 	"errors"
@@ -7,11 +7,15 @@ import (
 	"log"
 )
 
-type dbUserRepository struct {
-	db Database
+type DbUserRepository struct {
+	Db Database
 }
 
-func (r dbUserRepository) CreateUser(user usr.User) (int, error) {
+func NewDbUserRepository() usr.UserRepository {
+	return DbUserRepository{GetDatabase()}
+}
+
+func (r DbUserRepository) CreateUser(user usr.User) (int64, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 
 	if err != nil {
@@ -21,7 +25,7 @@ func (r dbUserRepository) CreateUser(user usr.User) (int, error) {
 
 	stmt := "INSERT INTO users (name, email, password, created) VALUES ($1, $2, $3, CURRENT_DATE) RETURNING ID"
 
-	result, err := r.db.Query(stmt, user.Name, user.Email, string(hashedPassword))
+	result, err := r.Db.Query(stmt, user.Name, user.Email, string(hashedPassword))
 	if err != nil {
 		log.Print(err)
 		return 0, err
@@ -30,7 +34,7 @@ func (r dbUserRepository) CreateUser(user usr.User) (int, error) {
 	if err := result.Next(); !err {
 		return 0, errors.New("no rows in result")
 	}
-	var id int
+	var id int64
 	err = result.Scan(&id)
 	if err != nil {
 		return 0, err
@@ -39,8 +43,8 @@ func (r dbUserRepository) CreateUser(user usr.User) (int, error) {
 	return id, nil
 }
 
-func (r dbUserRepository) GetUserByEmail(email string) (*usr.User, error) {
-	row := r.db.QueryRow("SELECT id, name, email, password FROM users WHERE email = $1", email)
+func (r DbUserRepository) GetUserByEmail(email string) (*usr.User, error) {
+	row := r.Db.QueryRow("SELECT id, name, email, password FROM users WHERE email = $1", email)
 	user := usr.User{}
 	if err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Password); err != nil {
 		return nil, err

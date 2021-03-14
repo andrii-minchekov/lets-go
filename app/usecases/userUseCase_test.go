@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestNewUserUseCase(t *testing.T) {
+func TestNewUserUseCaseUT(t *testing.T) {
 	type args struct {
 		repo usr.UserRepository
 	}
@@ -62,7 +62,7 @@ func recoverPanicIfNeeded(fn func(repo usr.UserRepository) UserUseCase, arg usr.
 	return
 }
 
-func TestUserUseCase_SignInUser(t *testing.T) {
+func TestUserUseCase_SignInUserUT(t *testing.T) {
 	type fields struct {
 		repo usr.UserRepository
 	}
@@ -70,7 +70,7 @@ func TestUserUseCase_SignInUser(t *testing.T) {
 		email    string
 		password string
 	}
-	expectedUserId := 1
+	expectedUserId := int64(1)
 	mockedRepo := func(user *usr.User, err error) usr.UserRepository {
 		mockDbRepo := &mockDbRepo{}
 		mockDbRepo.On("GetUserByEmail", mock.Anything).Return(user, err)
@@ -80,7 +80,7 @@ func TestUserUseCase_SignInUser(t *testing.T) {
 		name      string
 		fields    fields
 		args      args
-		wantValue int
+		wantValue int64
 		wantErr   error
 	}{
 		{
@@ -122,7 +122,7 @@ type mockDbRepo struct {
 	mock.Mock
 }
 
-func (r *mockDbRepo) CreateUser(user usr.User) (int, error) {
+func (r *mockDbRepo) CreateUser(user usr.User) (int64, error) {
 	panic("implement me")
 }
 

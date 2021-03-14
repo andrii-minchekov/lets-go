@@ -221,7 +221,7 @@ func (app *App) SignInUser(w http.ResponseWriter, r *http.Request) {
 
 	// Add the ID of the current user to the session
 	session := app.Sessions.Load(r)
-	err = session.PutInt(w, "currentUserID", currentUserID)
+	err = session.PutInt(w, "currentUserID", int(currentUserID))
 
 	if err != nil {
 		app.ServerError(w, err)

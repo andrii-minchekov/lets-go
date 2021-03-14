@@ -11,13 +11,8 @@ import (
 var errRepoIsNil = errors.New("repo shouldn't be nil")
 
 type UserUseCase interface {
-	SignupUser(user usr.User) (int, error)
-	SignInUser(email, password string) (int, error)
-}
-
-type UserUseCaseImplTest struct {
-	Repo usr.UserRepository
-	fun  func()
+	SignupUser(user usr.User) (int64, error)
+	SignInUser(email, password string) (int64, error)
 }
 
 type userUseCaseImpl struct {
@@ -32,11 +27,11 @@ func NewUserUseCase(repo usr.UserRepository) UserUseCase {
 	return userUseCaseImpl{Repo: repo, hashComparator: bcrypt.CompareHashAndPassword}
 }
 
-func (uc userUseCaseImpl) SignupUser(user usr.User) (int, error) {
+func (uc userUseCaseImpl) SignupUser(user usr.User) (int64, error) {
 	return uc.Repo.CreateUser(user)
 }
 
-func (uc userUseCaseImpl) SignInUser(email, password string) (int, error) {
+func (uc userUseCaseImpl) SignInUser(email, password string) (int64, error) {
 	user, err := uc.Repo.GetUserByEmail(email)
 
 	if err == sql.ErrNoRows {

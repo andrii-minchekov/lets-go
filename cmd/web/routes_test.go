@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/andrii-minchekov/lets-go/app/impl"
-	"github.com/andrii-minchekov/lets-go/app/usecases/mocks"
+	"github.com/andrii-minchekov/lets-go/app/impl/cfg"
 	snp "github.com/andrii-minchekov/lets-go/domain/snippet"
 	usr "github.com/andrii-minchekov/lets-go/domain/user"
+	"github.com/andrii-minchekov/lets-go/mocks"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"math/rand"
@@ -44,8 +45,7 @@ func mockCreateSnippet(snippet snp.Snippet) *mocks.UseCases {
 }
 
 func Test_SignUpSuccessIT(t *testing.T) {
-	config := impl.NewFlagConfig()
-	srv := httptest.NewServer((&App{Config: config, Cases: impl.NewComposedUseCases(config)}).Routes())
+	srv := httptest.NewServer((&App{Config: cfg.FlagConfig, Cases: impl.NewComposedUseCases(cfg.FlagConfig)}).Routes())
 	defer srv.Close()
 
 	rand.Seed(time.Now().UTC().UnixNano())

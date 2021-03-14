@@ -1,4 +1,4 @@
-package impl
+package db
 
 import (
 	"database/sql"
@@ -6,15 +6,19 @@ import (
 	"github.com/andrii-minchekov/lets-go/domain/snippet"
 )
 
-type dbSnippetRepository struct {
-	db Database
+type DbSnippetRepository struct {
+	Db Database
 }
 
-func (r dbSnippetRepository) AddSnippet(snippet snp.Snippet) (int64, error) {
+func NewDbSnippetRepository() DbSnippetRepository {
+	return DbSnippetRepository{GetDatabase()}
+}
+
+func (r DbSnippetRepository) AddSnippet(snippet snp.Snippet) (int64, error) {
 	stmt := `INSERT INTO snippets (title, content, created, expires) 
 	VALUES($1, $2, CURRENT_DATE, CURRENT_DATE + INTERVAL '100000 seconds') returning id`
 
-	result, err := r.db.Query(stmt, snippet.Title, snippet.Content)
+	result, err := r.Db.Query(stmt, snippet.Title, snippet.Content)
 
 	if err != nil {
 		return 0, err
@@ -31,11 +35,11 @@ func (r dbSnippetRepository) AddSnippet(snippet snp.Snippet) (int64, error) {
 	return id, nil
 }
 
-func (r dbSnippetRepository) LatestSnippets() (snp.Snippets, error) {
+func (r DbSnippetRepository) LatestSnippets() (snp.Snippets, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
 	ORDER BY created DESC LIMIT 10`
 
-	rows, err := r.db.Query(stmt)
+	rows, err := r.Db.Query(stmt)
 
 	if err != nil {
 		return nil, err
@@ -68,11 +72,11 @@ func (r dbSnippetRepository) LatestSnippets() (snp.Snippets, error) {
 	return snippets, nil
 }
 
-func (r dbSnippetRepository) GetSnippet(id int64) (*snp.Snippet, error) {
+func (r DbSnippetRepository) GetSnippet(id int64) (*snp.Snippet, error) {
 
 	stmt := `SELECT id, title, content, created, expires FROM snippets WHERE id = $1`
 
-	row := r.db.QueryRow(stmt, id)
+	row := r.Db.QueryRow(stmt, id)
 
 	s := &snp.Snippet{}
 

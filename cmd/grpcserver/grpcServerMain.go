@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/andrii-minchekov/lets-go/app/impl"
+	"github.com/andrii-minchekov/lets-go/app/impl/cfg"
 	pb "github.com/andrii-minchekov/lets-go/app/impl/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -21,7 +22,7 @@ func main() {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 
-	useCases := impl.NewComposedUseCases(impl.NewFlagConfig())
+	useCases := impl.NewComposedUseCases(cfg.FlagConfig)
 	pb.RegisterSnippetServiceServer(grpcServer, &snippetServer{useCases})
 	grpcServer.Serve(listener)
 }

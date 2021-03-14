@@ -26,8 +26,9 @@ func (useCase snippetUseCaseImpl) CreateSnippet(snippet snp.Snippet) (int64, err
 	id, err := useCase.Repo.AddSnippet(snippet)
 	if err != nil {
 		log.Printf("Couldn't add snippet %s", err)
+	} else {
+		log.Printf("CreateSnippet UseCase created snippet with id=%d", id)
 	}
-	log.Printf("Snippet %v is created", snippet)
 	return id, err
 }
 
@@ -44,7 +45,8 @@ func (useCase snippetUseCaseImpl) GetSnippet(id int64) (*snp.Snippet, error) {
 	snippet, err := useCase.Repo.GetSnippet(id)
 	if err != nil {
 		log.Printf("Couldn't get snippet by id %d because %s", id, err)
+	} else {
+		log.Printf("Snippet by id %d found successfully", id)
 	}
-	log.Printf("Snippet by id %d found successfully", id)
 	return snippet, err
 }

@@ -2,15 +2,22 @@ package uc
 
 import (
 	"errors"
+	"github.com/andrii-minchekov/lets-go/app/impl/db"
 	snp "github.com/andrii-minchekov/lets-go/domain/snippet"
+	usr "github.com/andrii-minchekov/lets-go/domain/user"
+	"github.com/stretchr/testify/require"
 	"log"
-	"reflect"
+	"strconv"
 	"testing"
 )
 
 type mockRepo struct {
 	expectedErr  error
 	expSnippetId int64
+}
+
+func (r mockRepo) GetUserSnippet(id int64) (*snp.UserSnippet, error) {
+	panic("implement me")
 }
 
 func (r mockRepo) LatestSnippets() (snp.Snippets, error) {
@@ -29,7 +36,7 @@ func (r mockRepo) AddSnippet(snippet snp.Snippet) (int64, error) {
 	return r.expSnippetId, nil
 }
 
-func TestSnippetUseCase_CreateSnippet(t *testing.T) {
+func TestSnippetUseCase_CreateSnippetUT(t *testing.T) {
 	type fields struct {
 		Repo snp.SnippetRepository
 	}
@@ -45,7 +52,7 @@ func TestSnippetUseCase_CreateSnippet(t *testing.T) {
 	}{
 		{
 			"should create snippet successfully when snippet input is valid",
-			fields{Repo: mockRepo{expSnippetId: 1}},
+			fields{Repo: mockRepo{expSnippetId: int64(1)}},
 			args{snp.Snippet{}},
 			1,
 			false,
@@ -73,60 +80,70 @@ func TestSnippetUseCase_CreateSnippet(t *testing.T) {
 	}
 }
 
-func TestSnippetUseCase_GetSnippet(t *testing.T) {
-	type fields struct {
-		Repo snp.SnippetRepository
-	}
-	type args struct {
-		id int64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *snp.Snippet
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			useCase := NewSnippetUseCase(tt.fields.Repo)
-			got, err := useCase.GetSnippet(tt.args.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetSnippet() expectedErr = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetSnippet() got = %v, wantValue %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestSnippetUseCase_LatestSnippets(t *testing.T) {
+func TestSnippetUseCase_LatestSnippetsIT(t *testing.T) {
 	type fields struct {
 		Repo snp.SnippetRepository
 	}
 	tests := []struct {
 		name    string
 		fields  fields
-		want    snp.Snippets
+		want    int
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "should return latest created snippets",
+			fields:  fields{db.NewOrmSnippetRepository()},
+			want:    10,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			useCase := NewSnippetUseCase(tt.fields.Repo)
+			for i := 0; i < 11; i++ {
+				useCase.CreateSnippet(snp.Snippet{
+					Title:   "title" + strconv.Itoa(i),
+					Content: "content" + strconv.Itoa(i),
+				})
+			}
 			got, err := useCase.LatestSnippets()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LatestSnippets() expectedErr = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LatestSnippets() got = %v, wantValue %v", got, tt.want)
+			if len(got) != tt.want {
+				t.Errorf("LatestSnippets() got = %v, wantValue %v", len(got), tt.want)
 			}
 		})
 	}
 }
+
+func TestGetSnippetSuccessIT(t *testing.T) {
+	snpUseCase, snippetId := CreateUserAndSnippet()
+
+	actual, err := snpUseCase.GetSnippet(int64(snippetId))
+
+	require.NotEmptyf(t, actual, "Empty because of %v", err)
+	require.NotEmptyf(t, actual.UserId, "userId of snippet should not be empty")
+	require.Greater(t, actual.ID, int64(0))
+	require.EqualValues(t, "TitleTestGetSnippetSuccessIT", actual.Title)
+}
+
+func CreateUserAndSnippet() (SnippetUseCase, SnippetId) {
+	snpUseCase := NewSnippetUseCase(db.NewOrmSnippetRepository())
+	usrUseCase := NewUserUseCase(db.NewDbUserRepository())
+	userId, _ := usrUseCase.SignupUser(usr.User{
+		Name:     "andi",
+		Email:    "andi@example.com",
+		Password: "12",
+	})
+	inSnippet := snp.Snippet{
+		Title:   "TitleTestGetSnippetSuccessIT",
+		Content: "ContentTestGetSnippetSuccessIT",
+		UserId:  &userId,
+	}
+	snippetId, _ := snpUseCase.CreateSnippet(inSnippet)
+	return snpUseCase, SnippetId(snippetId)
+}
+
+type SnippetId int64

@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"github.com/andrii-minchekov/lets-go/app/impl/db"
 	"github.com/andrii-minchekov/lets-go/app/usecases"
 	cfg "github.com/andrii-minchekov/lets-go/domain"
 )
@@ -11,9 +12,8 @@ type composedUseCases struct {
 }
 
 func NewComposedUseCases(config cfg.Config) uc.UseCases {
-	db := Database{connect(config.DSN())}
 	return composedUseCases{
-		uc.NewSnippetUseCase(dbSnippetRepository{db}),
-		uc.NewUserUseCase(dbUserRepository{db}),
+		uc.NewSnippetUseCase(db.NewOrmSnippetRepository()),
+		uc.NewUserUseCase(db.NewDbUserRepository()),
 	}
 }

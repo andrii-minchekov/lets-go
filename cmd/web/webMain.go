@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/alexedwards/scs"
 	"github.com/andrii-minchekov/lets-go/app/impl"
+	"github.com/andrii-minchekov/lets-go/app/impl/cfg"
 	_ "github.com/lib/pq"
 	"log"
 	"time"
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	config := impl.NewFlagConfig()
+	config := cfg.FlagConfig
 
 	// Initialize the Session Store
 	sessionManager := scs.NewCookieManager(config.Secret())

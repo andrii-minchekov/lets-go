@@ -4,8 +4,8 @@ import (
 	"context"
 	pb "github.com/andrii-minchekov/lets-go/app/impl/grpc"
 	uc "github.com/andrii-minchekov/lets-go/app/usecases"
-	"github.com/andrii-minchekov/lets-go/app/usecases/mocks"
 	snp "github.com/andrii-minchekov/lets-go/domain/snippet"
+	"github.com/andrii-minchekov/lets-go/mocks"
 	"github.com/stretchr/testify/mock"
 	"reflect"
 	"testing"
@@ -15,7 +15,7 @@ const title = "title"
 const content = "content"
 const snippetId = 1
 
-func Test_snippetServer_CreateSnippet(t *testing.T) {
+func Test_snippetServer_CreateSnippetUT(t *testing.T) {
 	type fields struct {
 		useCases uc.UseCases
 	}
